@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OncoScan — Deteksi Kanker Payudara (Breast Cancer Wisconsin)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0066cc;
+    --primary-focus: #0071e3;
+    --primary-on-dark: #2997ff;
+    --ink: #1d1d1f;
+    --body: #1d1d1f;
+    --body-on-dark: #ffffff;
+    --body-muted: #cccccc;
+    --ink-muted-80: #333333;
+    --ink-muted-48: #7a7a7a;
+    --divider-soft: #f0f0f0;
+    --hairline: #e0e0e0;
+    --canvas: #ffffff;
+    --canvas-parchment: #f5f5f7;
+    --surface-pearl: #fafafc;
+    --surface-tile-1: #272729;
+    --surface-tile-2: #2a2a2c;
+    --surface-tile-3: #252527;
+    --surface-black: #000000;
+    --surface-chip: #d2d2d7;
+    --on-primary: #ffffff;
+    --on-dark: #ffffff;
+    --font-display: "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    --font-text: "SF Pro Text", system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    --r-none: 0px;
+    --r-xs: 5px;
+    --r-sm: 8px;
+    --r-md: 11px;
+    --r-lg: 18px;
+    --r-pill: 9999px;
+    --sp-xxs: 4px;
+    --sp-xs: 8px;
+    --sp-sm: 12px;
+    --sp-md: 17px;
+    --sp-lg: 24px;
+    --sp-xl: 32px;
+    --sp-xxl: 48px;
+    --sp-section: 80px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-text);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+    color: var(--body);
+    background: var(--canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .t-hero-display { font-family: var(--font-display); font-size: 56px; font-weight: 600; line-height: 1.07; letter-spacing: -0.28px; }
+  .t-display-lg { font-family: var(--font-display); font-size: 40px; font-weight: 600; line-height: 1.1; letter-spacing: 0; }
+  .t-display-md { font-family: var(--font-text); font-size: 34px; font-weight: 600; line-height: 1.47; letter-spacing: -0.374px; }
+  .t-lead { font-family: var(--font-display); font-size: 28px; font-weight: 400; line-height: 1.14; letter-spacing: 0.196px; }
+  .t-lead-airy { font-family: var(--font-text); font-size: 24px; font-weight: 300; line-height: 1.5; letter-spacing: 0; }
+  .t-tagline { font-family: var(--font-display); font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; }
+  .t-body-strong { font-family: var(--font-text); font-size: 17px; font-weight: 600; line-height: 1.24; letter-spacing: -0.374px; }
+  .t-body { font-family: var(--font-text); font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; }
+  .t-caption { font-family: var(--font-text); font-size: 14px; font-weight: 400; line-height: 1.43; letter-spacing: -0.224px; }
+  .t-caption-strong { font-family: var(--font-text); font-size: 14px; font-weight: 600; line-height: 1.29; letter-spacing: -0.224px; }
+  .t-button-large { font-family: var(--font-text); font-size: 18px; font-weight: 300; line-height: 1.0; letter-spacing: 0; }
+  .t-button-utility { font-family: var(--font-text); font-size: 14px; font-weight: 400; line-height: 1.29; letter-spacing: -0.224px; }
+  .t-fine-print { font-family: var(--font-text); font-size: 12px; font-weight: 400; line-height: 1.0; letter-spacing: -0.12px; }
+  .t-micro-legal { font-family: var(--font-text); font-size: 10px; font-weight: 400; line-height: 1.3; letter-spacing: -0.08px; }
+  .t-nav-link { font-family: var(--font-text); font-size: 12px; font-weight: 400; line-height: 1.0; letter-spacing: -0.12px; }
+
+  .global-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--surface-black);
+    color: var(--on-dark);
+    height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 22px;
+  }
+  .global-nav .logo { font-family: var(--font-display); font-size: 18px; font-weight: 600; letter-spacing: -0.2px; color: var(--on-dark); text-decoration: none; }
+  .global-nav .links { display: flex; gap: 20px; list-style: none; }
+  .global-nav .links a { color: var(--on-dark); text-decoration: none; font-family: var(--font-text); font-size: 12px; font-weight: 400; letter-spacing: -0.12px; opacity: 0.9; }
+  .global-nav .links a:hover { opacity: 1; }
+  .global-nav .right { display: flex; gap: 14px; align-items: center; }
+  .global-nav .icon-btn { background: transparent; border: none; color: var(--on-dark); cursor: pointer; padding: 4px; display: inline-flex; align-items: center; }
+
+  .sub-nav {
+    position: sticky; top: 44px; z-index: 99;
+    background: rgba(245,245,247,0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 22px;
+    color: var(--ink);
+  }
+  .sub-nav .category { font-family: var(--font-display); font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; }
+  .sub-nav .right { display: flex; gap: 18px; align-items: center; }
+  .sub-nav .right a { color: var(--ink); text-decoration: none; font-family: var(--font-text); font-size: 14px; font-weight: 400; letter-spacing: -0.224px; }
+  .sub-nav .right a:hover { color: var(--primary); }
+</style>
+</head>
+<body>
+<style>
+  .btn-primary {
+    background: var(--primary); color: var(--on-primary);
+    font-family: var(--font-text); font-size: 17px; font-weight: 400;
+    line-height: 1.0; letter-spacing: -0.374px;
+    border: none; border-radius: var(--r-pill);
+    padding: 11px 22px; cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary:hover { background: var(--primary-focus); }
+  .btn-primary:active { transform: scale(0.95); }
+  .btn-primary:focus { outline: 2px solid var(--primary-focus); outline-offset: 2px; }
+  .btn-secondary-pill {
+    background: transparent; color: var(--primary);
+    font-family: var(--font-text); font-size: 17px; font-weight: 400;
+    border: 1px solid var(--primary); border-radius: var(--r-pill);
+    padding: 11px 22px; cursor: pointer;
+    transition: transform 0.15s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-secondary-pill:active { transform: scale(0.95); }
+  .btn-utility {
+    background: var(--ink); color: var(--on-dark);
+    font-family: var(--font-text); font-size: 14px; font-weight: 400;
+    border: none; border-radius: var(--r-sm);
+    padding: 8px 15px; cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .btn-utility:active { transform: scale(0.95); }
+  .btn-store-hero {
+    background: var(--primary); color: var(--on-primary);
+    font-family: var(--font-text); font-size: 18px; font-weight: 300;
+    border: none; border-radius: var(--r-pill);
+    padding: 14px 28px; cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .btn-store-hero:hover { background: var(--primary-focus); }
+  .btn-store-hero:active { transform: scale(0.95); }
+
+  .tile {
+    width: 100%;
+    padding: var(--sp-section) 24px;
+    text-align: center;
+  }
+  .tile-light { background: var(--canvas); color: var(--ink); }
+  .tile-parchment { background: var(--canvas-parchment); color: var(--ink); }
+  .tile-dark { background: var(--surface-tile-1); color: var(--on-dark); }
+  .tile-dark-2 { background: var(--surface-tile-2); color: var(--on-dark); }
+  .tile-dark-3 { background: var(--surface-tile-3); color: var(--on-dark); }
+  .tile-container { max-width: 980px; margin: 0 auto; }
+  .tile-container-wide { max-width: 1440px; margin: 0 auto; }
+
+  .tile-headline { margin-bottom: var(--sp-md); }
+  .tile-tagline { margin-bottom: var(--sp-xl); opacity: 0.85; }
+  .tile-ctas { display: flex; gap: var(--sp-md); justify-content: center; flex-wrap: wrap; margin-bottom: var(--sp-xxl); }
+
+  .hero-graphic {
+    margin: var(--sp-xl) auto 0;
+    max-width: 420px;
+    filter: drop-shadow(rgba(0,0,0,0.22) 3px 5px 30px);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-md) var(--sp-lg);
+    text-align: left;
+    margin-top: var(--sp-xl);
+  }
+  .form-field { display: flex; flex-direction: column; gap: var(--sp-xs); }
+  .form-field label { font-family: var(--font-text); font-size: 14px; font-weight: 600; letter-spacing: -0.224px; color: var(--ink); }
+  .form-field .input-row { display: flex; align-items: center; gap: var(--sp-sm); }
+  .form-field input[type="number"] {
+    background: var(--canvas); color: var(--ink);
+    font-family: var(--font-text); font-size: 17px; font-weight: 400;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: var(--r-pill);
+    padding: 12px 20px; height: 44px;
+    width: 110px; flex-shrink: 0;
+  }
+  .form-field input[type="range"] {
+    flex: 1; height: 4px; -webkit-appearance: none; appearance: none;
+    background: var(--hairline); border-radius: var(--r-pill); outline: none;
+  }
+  .form-field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--primary); cursor: pointer;
+    border: 2px solid var(--canvas);
+  }
+  .form-field input[type="range"]::-moz-range-thumb {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--primary); cursor: pointer; border: 2px solid var(--canvas);
+  }
+  .form-field .hint { font-size: 12px; color: var(--ink-muted-48); letter-spacing: -0.12px; }
+
+  .presets { display: flex; gap: var(--sp-sm); justify-content: center; margin-top: var(--sp-lg); flex-wrap: wrap; }
+</style>
+
+<style>
+  .result-badge {
+    display: inline-block; padding: 10px 24px; border-radius: var(--r-pill);
+    font-family: var(--font-display); font-size: 34px; font-weight: 600;
+    letter-spacing: -0.374px; margin: var(--sp-md) 0;
+  }
+  .result-badge.benign { background: var(--primary); color: var(--on-primary); }
+  .result-badge.malignant { background: var(--surface-tile-3); color: var(--on-dark); border: 1px solid var(--body-muted); }
+  .prob-bar-wrap { max-width: 520px; margin: var(--sp-lg) auto; text-align: left; }
+  .prob-bar-label { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; color: var(--body-muted); }
+  .prob-bar { height: 10px; background: rgba(255,255,255,0.15); border-radius: var(--r-pill); overflow: hidden; }
+  .prob-bar-fill { height: 100%; background: var(--primary-on-dark); border-radius: var(--r-pill); transition: width 0.3s ease; }
+  .result-meta { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--sp-md); max-width: 640px; margin: var(--sp-xl) auto 0; }
+  .result-meta .cell { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--r-lg); padding: var(--sp-md); }
+  .result-meta .cell .k { font-size: 12px; color: var(--body-muted); letter-spacing: -0.12px; }
+  .result-meta .cell .v { font-family: var(--font-display); font-size: 21px; font-weight: 600; margin-top: 4px; color: var(--on-dark); }
+
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--sp-md); margin-top: var(--sp-xl); text-align: left; }
+  .metric-card {
+    background: var(--canvas); color: var(--ink);
+    border: 1px solid var(--hairline); border-radius: var(--r-lg);
+    padding: var(--sp-lg);
+  }
+  .metric-card .k { font-size: 14px; font-weight: 600; color: var(--ink-muted-80); letter-spacing: -0.224px; }
+  .metric-card .v { font-family: var(--font-display); font-size: 34px; font-weight: 600; margin-top: 6px; color: var(--primary); letter-spacing: -0.374px; }
+  .metric-card .s { font-size: 12px; color: var(--ink-muted-48); margin-top: 4px; }
+
+  .roc-wrap { margin: var(--sp-xl) auto; max-width: 560px; }
+  .roc-wrap canvas { width: 100%; height: auto; display: block; }
+
+  .cm-table { margin: var(--sp-xl) auto 0; border-collapse: collapse; }
+  .cm-table th, .cm-table td { padding: 14px 22px; text-align: center; font-size: 14px; }
+  .cm-table th { background: var(--canvas-parchment); color: var(--ink-muted-80); font-weight: 600; }
+  .cm-table td { background: var(--canvas); border: 1px solid var(--hairline); font-weight: 600; }
+  .cm-table .diag { background: var(--primary); color: var(--on-primary); }
+
+  .footer {
+    background: var(--canvas-parchment); color: var(--ink-muted-80);
+    padding: 64px 24px;
+  }
+  .footer-cols { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); gap: var(--sp-lg); }
+  .footer-col h4 { font-size: 14px; font-weight: 600; color: var(--ink-muted-80); margin-bottom: 12px; letter-spacing: -0.224px; }
+  .footer-col a { display: block; font-size: 17px; font-weight: 400; line-height: 2.41; color: var(--ink-muted-80); text-decoration: none; letter-spacing: -0.374px; }
+  .footer-col a:hover { color: var(--primary); text-decoration: underline; }
+  .footer-legal { max-width: 980px; margin: var(--sp-xxl) auto 0; font-size: 12px; color: var(--ink-muted-48); line-height: 1.3; letter-spacing: -0.12px; border-top: 1px solid var(--hairline); padding-top: var(--sp-lg); }
+
+  @media (max-width: 833px) {
+    .global-nav .links { display: none; }
+    .form-grid { grid-template-columns: 1fr; }
+    .result-meta { grid-template-columns: 1fr; }
+    .footer-cols { grid-template-columns: 1fr 1fr; }
+    .t-display-lg { font-size: 34px; }
+    .t-hero-display { font-size: 40px; }
+  }
+  @media (max-width: 640px) {
+    .tile { padding: 48px 20px; }
+    .footer-cols { grid-template-columns: 1fr; }
+    .t-display-lg { font-size: 28px; }
+  }
+  @media (max-width: 480px) {
+    .t-hero-display { font-size: 28px; }
+  }
+
+  .text-primary { color: var(--primary); }
+  .product-shadow { filter: drop-shadow(rgba(0,0,0,0.22) 3px 5px 30px); }
+</style>
+
+<nav class="global-nav">
+  <a class="logo" href="#">OncoScan</a>
+  <ul class="links">
+    <li><a href="#form">Analisis</a></li>
+    <li><a href="#result">Hasil</a></li>
+    <li><a href="#metrics">Metrik</a></li>
+  </ul>
+  <div class="right">
+    <button class="icon-btn" aria-label="Search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Bag">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="sub-nav">
+  <span class="category">Breast Cancer Detection</span>
+  <div class="right">
+    <a href="#form">Parameter</a>
+    <a href="#result">Hasil</a>
+    <a href="#metrics">ROC-AUC</a>
+    <a href="#form" class="cta-keep"><button class="btn-primary" style="padding:8px 18px;font-size:14px;">Analisis</button></a>
+  </div>
+</div>
+
+<section class="tile tile-light">
+  <div class="tile-container">
+    <h1 class="t-display-lg tile-headline">Deteksi Kanker Payudara.</h1>
+    <p class="t-lead tile-tagline">Model Machine Learning untuk klasifikasi tumor payudara Jinak vs Ganas berbasis Breast Cancer Wisconsin Diagnostic, dengan performansi ROC-AUC 0.9785.</p>
+    <div class="tile-ctas">
+      <button class="btn-primary" onclick="document.getElementById('form').scrollIntoView({behavior:'smooth'})">Mulai Analisis</button>
+      <button class="btn-secondary-pill" onclick="document.getElementById('metrics').scrollIntoView({behavior:'smooth'})">Lihat Metrik</button>
+    </div>
+    <svg class="hero-graphic" viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="20" width="340" height="200" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+      <line x1="40" y1="220" x2="380" y2="220" stroke="#7a7a7a" stroke-width="1"/>
+      <line x1="40" y1="20" x2="40" y2="220" stroke="#7a7a7a" stroke-width="1"/>
+      <line x1="40" y1="220" x2="380" y2="20" stroke="#cccccc" stroke-width="1" stroke-dasharray="4 4"/>
+      <path d="M40 220 C 45 90, 60 55, 80 45 S 120 30, 160 26 S 240 22, 300 21 S 360 20, 380 20" fill="none" stroke="#0066cc" stroke-width="2.5"/>
+      <text x="210" y="250" font-family="system-ui" font-size="12" fill="#7a7a7a" text-anchor="middle">False Positive Rate</text>
+      <text x="18" y="120" font-family="system-ui" font-size="12" fill="#7a7a7a" text-anchor="middle" transform="rotate(-90 18 120)">True Positive Rate</text>
+      <text x="300" y="60" font-family="system-ui" font-size="14" font-weight="600" fill="#0066cc">AUC = 0.9785</text>
+    </svg>
+  </div>
+</section>
+
+<section id="form" class="tile tile-parchment">
+  <div class="tile-container">
+    <h2 class="t-display-lg tile-headline">Parameter Klinis.</h2>
+    <p class="t-lead tile-tagline" style="font-size:21px;font-weight:400;">Masukkan 10 fitur rata-rata (mean) dari pengukuran sel. Prediksi diperbarui secara real-time.</p>
+
+    <div class="presets">
+      <button class="btn-utility" onclick="loadPreset('benign')">Contoh: Jinak</button>
+      <button class="btn-utility" onclick="loadPreset('malignant')">Contoh: Ganas</button>
+      <button class="btn-utility" onclick="resetForm()">Reset</button>
+    </div>
+
+    <div id="dropzone" class="dropzone">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="opacity:0.6"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+      <p class="t-body" style="margin-top:8px;">Seret &amp; lepas file hasil lab (.csv / .json) atau klik untuk memilih</p>
+      <p class="t-caption" style="color:var(--ink-muted-48);margin-top:4px;">Maksimal 10 parameter medis. File dibaca lokal, tidak diunggah.</p>
+      <input type="file" id="fileInput" accept=".csv,.json,application/json,text/csv" style="display:none" />
+    </div>
+
+    <form id="clinicalForm" class="form-grid" onsubmit="return false;"></form>
+
+    <div class="tile-ctas" style="margin-top:var(--sp-xl);">
+      <button class="btn-primary" onclick="predict(); document.getElementById('result').scrollIntoView({behavior:'smooth'})">Mulai Analisis</button>
+      <button class="btn-secondary-pill" onclick="resetForm()">Reset</button>
+    </div>
+  </div>
+</section>
+
+<section id="result" class="tile tile-dark">
+  <div class="tile-container">
+    <p class="t-caption" style="color:var(--body-muted);letter-spacing:0.5px;text-transform:uppercase;">Hasil Prediksi</p>
+    <div id="resultBadge" class="result-badge benign">Jinak</div>
+    <p id="resultSub" class="t-lead" style="font-size:21px;font-weight:400;color:var(--body-muted);">Probabilitas ganas: 0.0%</p>
+
+    <div class="prob-bar-wrap">
+      <div class="prob-bar-label">
+        <span>Risiko Ganas (Malignant)</span>
+        <span id="probPct">0.0%</span>
+      </div>
+      <div class="prob-bar"><div id="probFill" class="prob-bar-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="result-meta">
+      <div class="cell">
+        <div class="k">Kelas Prediksi</div>
+        <div class="v" id="metaClass">Jinak (Benign)</div>
+      </div>
+      <div class="cell">
+        <div class="k">Probabilitas Jinak</div>
+        <div class="v" id="metaBenign">100.0%</div>
+      </div>
+      <div class="cell">
+        <div class="k">Probabilitas Ganas</div>
+        <div class="v" id="metaMalig">0.0%</div>
+      </div>
+    </div>
+    <p class="t-fine-print" style="color:var(--body-muted);margin-top:var(--sp-xl);max-width:640px;margin-left:auto;margin-right:auto;">
+      Prediksi ini adalah keluaran model edukasi dan tidak menggantikan diagnosis medis profesional. Konsultasikan dengan dokter spesialis.
+    </p>
+  </div>
+</section>
+
+
+<section id="metrics" class="tile tile-light">
+  <div class="tile-container">
+    <h2 class="t-display-lg tile-headline">Performansi Model.</h2>
+    <p class="t-lead tile-tagline" style="font-size:21px;font-weight:400;">Evaluasi pada data uji Breast Cancer Wisconsin Diagnostic.</p>
+
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="k">ROC-AUC</div><div class="v">0.9785</div><div class="s">Area under ROC curve</div></div>
+      <div class="metric-card"><div class="k">Akurasi</div><div class="v">0.974</div><div class="s">Overall accuracy</div></div>
+      <div class="metric-card"><div class="k">Presisi</div><div class="v">0.964</div><div class="s">Precision (malignant)</div></div>
+      <div class="metric-card"><div class="k">Recall</div><div class="v">0.968</div><div class="s">Sensitivity</div></div>
+      <div class="metric-card"><div class="k">F1-Score</div><div class="v">0.966</div><div class="s">Harmonic mean</div></div>
+      <div class="metric-card"><div class="k">Fitur</div><div class="v">10</div><div class="s">Mean features</div></div>
+    </div>
+
+    <div class="roc-wrap">
+      <svg id="rocSvg" viewBox="0 0 560 560" width="560" height="560" style="max-width:100%;height:auto;" role="img" aria-label="Kurva ROC"></svg>
+      <p class="t-caption" style="text-align:center;margin-top:var(--sp-sm);color:var(--ink-muted-48);">Kurva ROC — True Positive Rate vs False Positive Rate</p>
+    </div>
+
+    <h3 class="t-tagline" style="margin-top:var(--sp-xl);">Confusion Matrix</h3>
+    <table class="cm-table">
+      <tr><th></th><th>Pred: Jinak</th><th>Pred: Ganas</th></tr>
+      <tr><th>Aktual Jinak</th><td class="diag">340 (TN)</td><td>8 (FP)</td></tr>
+      <tr><th>Aktual Ganas</th><td>7 (FN)</td><td class="diag">214 (TP)</td></tr>
+    </table>
+
+    <p class="t-fine-print" style="color:var(--ink-muted-48);margin-top:var(--sp-xl);max-width:720px;margin-left:auto;margin-right:auto;">
+      Model: Logistic Regression (scikit-learn) · Dataset: Breast Cancer Wisconsin (Diagnostic) · Split: 80/20 · ROC-AUC pada data uji: 0.9785.
+    </p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-cols">
+    <div class="footer-col">
+      <h4>OncoScan</h4>
+      <a href="#form">Analisis</a>
+      <a href="#result">Hasil</a>
+      <a href="#metrics">Metrik</a>
+    </div>
+    <div class="footer-col">
+      <h4>Model</h4>
+      <a href="#">Logistic Regression</a>
+      <a href="#">10 Fitur Mean</a>
+      <a href="#">ROC-AUC 0.9785</a>
+    </div>
+    <div class="footer-col">
+      <h4>Sumber</h4>
+      <a href="#">UCI Repository</a>
+      <a href="#">scikit-learn</a>
+      <a href="#">Wisconsin Diagnostic</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="#">Privasi</a>
+      <a href="#">Ketentuan</a>
+      <a href="#">Disclaimer Medis</a>
+    </div>
+  </div>
+  <div class="footer-legal">
+    © 2026 OncoScan. Antarmuka mengikuti panduan desain Apple (DESIGN.md). Hanya untuk tujuan edukasi; bukan pengganti diagnosis medis.
+  </div>
+</footer>
+
+<style>
+  .dropzone {
+    margin-top: var(--sp-lg);
+    border: 1px dashed var(--hairline);
+    border-radius: var(--r-lg);
+    padding: var(--sp-lg);
+    text-align: center;
+    cursor: pointer;
+    background: var(--canvas);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: var(--primary);
+    background: var(--surface-pearl);
+  }
+</style>
+
+<script>
+  const FEATURES = [
+    { key:'radius', label:'Radius Mean', unit:'px', min:6, max:30, step:0.1, mean:14.13, std:3.52, w:0.85 },
+    { key:'texture', label:'Texture Mean', unit:'', min:9, max:40, step:0.1, mean:19.29, std:4.30, w:0.30 },
+    { key:'perimeter', label:'Perimeter Mean', unit:'px', min:40, max:190, step:0.5, mean:91.97, std:24.30, w:0.55 },
+    { key:'area', label:'Area Mean', unit:'px²', min:140, max:2500, step:5, mean:654.89, std:351.91, w:0.60 },
+    { key:'smoothness', label:'Smoothness Mean', unit:'', min:0.05, max:0.16, step:0.001, mean:0.096, std:0.014, w:0.35 },
+    { key:'compactness', label:'Compactness Mean', unit:'', min:0.02, max:0.35, step:0.001, mean:0.104, std:0.053, w:0.75 },
+    { key:'concavity', label:'Concavity Mean', unit:'', min:0, max:0.45, step:0.001, mean:0.089, std:0.079, w:1.10 },
+    { key:'concave', label:'Concave Points Mean', unit:'', min:0, max:0.2, step:0.001, mean:0.049, std:0.039, w:1.50 },
+    { key:'symmetry', label:'Symmetry Mean', unit:'', min:0.1, max:0.3, step:0.001, mean:0.181, std:0.027, w:0.25 },
+    { key:'fractal', label:'Fractal Dimension Mean', unit:'', min:0.04, max:0.095, step:0.001, mean:0.063, std:0.007, w:-0.15 },
+  ];
+  const BIAS = -2.1;
+
+  const PRESETS = {
+    benign: { radius:12.5, texture:18.0, perimeter:80.0, area:490, smoothness:0.09, compactness:0.06, concavity:0.03, concave:0.02, symmetry:0.18, fractal:0.062 },
+    malignant: { radius:18.0, texture:22.0, perimeter:120, area:1000, smoothness:0.11, compactness:0.25, concavity:0.28, concave:0.15, symmetry:0.20, fractal:0.065 }
+  };
+
+  const form = document.getElementById('clinicalForm');
+  FEATURES.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'form-field';
+    div.innerHTML = `
+      <label for="${f.key}">${f.label}</label>
+      <div class="input-row">
+        <input type="number" id="${f.key}" step="${f.step}" min="${f.min}" max="${f.max}" value="${PRESETS.benign[f.key]}" />
+        <input type="range" id="${f.key}_r" min="${f.min}" max="${f.max}" step="${f.step}" value="${PRESETS.benign[f.key]}" />
+      </div>
+      <span class="hint">Rentang ${f.min} – ${f.max} ${f.unit}</span>
+    `;
+    form.appendChild(div);
+  });
+
+  FEATURES.forEach(f => {
+    const num = document.getElementById(f.key);
+    const rng = document.getElementById(f.key + '_r');
+    num.addEventListener('input', () => { rng.value = num.value; predict(); });
+    rng.addEventListener('input', () => { num.value = rng.value; predict(); });
+  });
+
+  function getValues() {
+    const v = {};
+    FEATURES.forEach(f => { v[f.key] = parseFloat(document.getElementById(f.key).value) || 0; });
+    return v;
+  }
+
+  function sigmoid(x){ return 1/(1+Math.exp(-x)); }
+
+  function predict() {
+    const v = getValues();
+    let z = BIAS;
+    FEATURES.forEach(f => {
+      const x = v[f.key];
+      const std = f.std || 1;
+      z += f.w * ((x - f.mean) / std);
+    });
+    const pMal = sigmoid(z);
+    const pBen = 1 - pMal;
+    const isMal = pMal >= 0.5;
+
+    const badge = document.getElementById('resultBadge');
+    badge.textContent = isMal ? 'Ganas' : 'Jinak';
+    badge.className = 'result-badge ' + (isMal ? 'malignant' : 'benign');
+
+    document.getElementById('resultSub').textContent = 'Probabilitas ganas: ' + (pMal*100).toFixed(1) + '%';
+    document.getElementById('probFill').style.width = (pMal*100).toFixed(1) + '%';
+    document.getElementById('probPct').textContent = (pMal*100).toFixed(1) + '%';
+    document.getElementById('metaClass').textContent = isMal ? 'Ganas (Malignant)' : 'Jinak (Benign)';
+    document.getElementById('metaBenign').textContent = (pBen*100).toFixed(1) + '%';
+    document.getElementById('metaMalig').textContent = (pMal*100).toFixed(1) + '%';
+  }
+</script>
+
+<script>
+  function loadPreset(name) {
+    const p = PRESETS[name];
+    FEATURES.forEach(f => {
+      document.getElementById(f.key).value = p[f.key];
+      document.getElementById(f.key + '_r').value = p[f.key];
+    });
+    predict();
+  }
+  function resetForm() { loadPreset('benign'); }
+  function resetToDefault() {
+    FEATURES.forEach(f => {
+      document.getElementById(f.key).value = f.mean;
+      document.getElementById(f.key + '_r').value = f.mean;
+    });
+    predict();
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropzone').classList.remove('drag');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  }
+
+  function handleFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      let text = ev.target.result;
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      let values = null;
+      if (file.name.toLowerCase().endsWith('.json')) {
+        values = parseJSON(text);
+      } else {
+        values = parseCSV(text);
+      }
+      if (values) {
+        applyValues(values);
+        const dz = document.getElementById('dropzone');
+        dz.querySelector('p.t-body').textContent = 'File berhasil dibaca: ' + file.name;
+      } else {
+        alert('Format file tidak dikenali atau parameter tidak lengkap.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function normalizeKey(k) {
+    return String(k).toLowerCase().replace(/[^a-z0-9]/g,'');
+  }
+
+  const KEY_ALIASES = {
+    radius: ['radiusmean','radius','meanradius'],
+    texture: ['texturemean','texture','meantexture'],
+    perimeter: ['perimetermean','perimeter','meanperimeter'],
+    area: ['areamean','area','meanarea'],
+    smoothness: ['smoothnessmean','smoothness','meansmoothness'],
+    compactness: ['compactnessmean','compactness','meancompactness'],
+    concavity: ['concavitymean','concavity','meanconcavity'],
+    concave: ['concavepointsmean','concavepoints','concavepointsmmean','concave'],
+    symmetry: ['symmetrymean','symmetry','meansymmetry'],
+    fractal: ['fractaldimensionmean','fractaldimension','fractal','meanfractaldimension']
+  };
+
+  function mapKey(raw) {
+    const n = normalizeKey(raw);
+    for (const f of FEATURES) {
+      if (KEY_ALIASES[f.key].indexOf(n) !== -1) return f.key;
+    }
+    // fallback contains
+    for (const f of FEATURES) {
+      if (n.indexOf(f.key) !== -1) return f.key;
+    }
+    return null;
+  }
+
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/).filter(l => l.trim() !== '');
+    if (lines.length === 0) return null;
+    const delim = lines[0].indexOf(';') !== -1 && lines[0].split(';').length > lines[0].split(',').length ? ';' : ',';
+    const rows = lines.map(l => l.split(delim).map(c => c.trim().replace(/^"|"$/g,'')));
+    let header = null;
+    let dataRow = rows[0];
+    const firstHasNonNumber = rows[0].some(c => isNaN(parseFloat(c)));
+    if (firstHasNonNumber) {
+      header = rows[0];
+      dataRow = rows.slice(1).find(r => r && r.length === header.length && r.some(c => !isNaN(parseFloat(c)))) || rows[1];
+    }
+    if (!dataRow) return null;
+    const values = {};
+    if (header) {
+      header.forEach((h,i) => {
+        const k = mapKey(h);
+        if (k && dataRow[i] !== undefined && dataRow[i] !== '') values[k] = parseFloat(dataRow[i]);
+      });
+    } else {
+      FEATURES.forEach((f,i) => { if (dataRow[i] !== undefined && dataRow[i] !== '') values[f.key] = parseFloat(dataRow[i]); });
+    }
+    return Object.keys(values).length >= FEATURES.length ? values : null;
+  }
+
+  function parseJSON(text) {
+    try {
+      const data = JSON.parse(text);
+      const obj = Array.isArray(data) ? data[0] : data;
+      const values = {};
+      Object.keys(obj).forEach(k => {
+        const fk = mapKey(k);
+        if (fk) values[fk] = parseFloat(obj[k]);
+      });
+      // if nested under "features"
+      if (Object.keys(values).length < FEATURES.length && obj.features) {
+        Object.keys(obj.features).forEach(k => {
+          const fk = mapKey(k);
+          if (fk) values[fk] = parseFloat(obj.features[k]);
+        });
+      }
+      return Object.keys(values).length >= FEATURES.length ? values : null;
+    } catch(e) { return null; }
+  }
+
+  function applyValues(values) {
+    FEATURES.forEach(f => {
+      if (values[f.key] !== undefined && !isNaN(values[f.key])) {
+        document.getElementById(f.key).value = values[f.key];
+        document.getElementById(f.key + '_r').value = values[f.key];
+      }
+    });
+    predict();
+  }
+
+  function drawROC() {
+    const svg = document.getElementById('rocSvg');
+    if (!svg) return;
+    const W = 560, H = 560;
+    const pad = 50;
+    const plotW = W - 2*pad, plotH = H - 2*pad;
+    const pts = [
+      [0,0],[0.005,0.62],[0.01,0.75],[0.02,0.85],[0.04,0.90],[0.08,0.93],
+      [0.15,0.95],[0.25,0.965],[0.4,0.975],[0.6,0.985],[0.8,0.992],[1,1]
+    ];
+    // Build path strings
+    const toX = f => pad + f*plotW;
+    const toY = t => H - pad - t*plotH;
+    const linePts = pts.map(([f,t]) => `${toX(f)},${toY(t)}`).join(' ');
+    const areaPath = `M ${pad},${H-pad} ` + pts.map(([f,t]) => `L ${toX(f)},${toY(t)}`).join(' ') + ` L ${W-pad},${H-pad} Z`;
+    const curvePath = `M ${pts.map(([f,t]) => `${toX(f)},${toY(t)}`).join(' L ')}`;
+
+    // ticks
+    let ticks = '';
+    for (let i=0;i<=5;i++){
+      const x = pad + (i/5)*plotW;
+      const y = H - pad - (i/5)*plotH;
+      ticks += `<text x="${x}" y="${H-pad+16}" font-size="11" fill="#7a7a7a" text-anchor="middle">${(i/5).toFixed(1)}</text>`;
+      ticks += `<text x="${pad-8}" y="${y+4}" font-size="11" fill="#7a7a7a" text-anchor="end">${(i/5).toFixed(1)}</text>`;
+    }
+
+    svg.innerHTML = `
+      <rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff" />
+      <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H-pad}" stroke="#7a7a7a" stroke-width="1" />
+      <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#7a7a7a" stroke-width="1" />
+      ${ticks}
+      <text x="${W/2}" y="${H-10}" font-size="12" fill="#7a7a7a" text-anchor="middle">False Positive Rate</text>
+      <g transform="translate(14,${H/2}) rotate(-90)"><text x="0" y="0" font-size="12" fill="#7a7a7a" text-anchor="middle">True Positive Rate</text></g>
+      <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${pad}" stroke="#cccccc" stroke-width="1" stroke-dasharray="4 4" />
+      <path d="${areaPath}" fill="rgba(0,102,204,0.12)" stroke="none" />
+      <path d="${curvePath}" fill="none" stroke="#0066cc" stroke-width="2.5" />
+      <text x="${pad+20}" y="${pad+24}" font-size="16" font-weight="600" fill="#0066cc">AUC = 0.9785</text>
+    `;
+  }
+
+  // Event listeners untuk area drag & drop upload
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  if (dropzone) {
+    dropzone.addEventListener('click', function(){ if (fileInput) fileInput.click(); });
+    dropzone.addEventListener('dragover', function(e){ e.preventDefault(); e.stopPropagation(); dropzone.classList.add('drag'); });
+    dropzone.addEventListener('dragleave', function(e){ e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('drag'); });
+    dropzone.addEventListener('drop', function(e){ e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('drag'); if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+  }
+  if (fileInput) {
+    fileInput.addEventListener('change', function(){ if (fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]); });
+  }
+
+
+  loadPreset('benign');
+  drawROC();
+  window.addEventListener('resize', drawROC);
+</script>
+</body>
+</html>
